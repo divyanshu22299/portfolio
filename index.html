@@ -367,7 +367,7 @@ footer{border-top:1px solid #1a1a1a;padding:34px 0 60px;text-align:center;color:
 <footer><div class="wrap"><span data-b data-type>© <span id="yr"></span> Divyanshu Singh Chouhan · Built and maintained live by a team of AI cursors.</span><br><button id="replay" type="button">↻ Replay the build</button></div></footer>
 
 <div id="cursors" aria-hidden="true"></div>
-<div id="ui"><button id="demo" type="button">▶ Cleaning demo</button><button id="demo2" type="button">▶ Shatter demo</button><button id="skip" type="button">Skip build ›</button><button id="toggle" type="button">Cursors: on</button></div>
+<div id="ui"><button id="skip" type="button">Skip build ›</button><button id="toggle" type="button">Cursors: on</button></div>
 
 <script>
 document.getElementById('yr').textContent=new Date().getFullYear();
@@ -574,7 +574,7 @@ document.getElementById('yr').textContent=new Date().getFullYear();
     const r=Math.random(),idleMs=NOW()-mouse.t;
     if(r<.07){a.rad=rnd(70,240);a.spin=rnd(.1,.42)*(Math.random()<.5?-1:1);if(Math.random()<.25)a.style=pick(['orbit','perch','trail'])}
     if(r>.9&&r<.96)a.talk(Math.random()<.5?pick(QUIRK[a.T.id]):pick(CHAT),1700);
-    if(mouse.seen&&idleMs>1800&&idleMs<9000&&a.curious>.45&&Math.random()<.1){
+    if(mouse.seen&&idleMs>1800&&idleMs<9000&&a.curious>.45&&Math.random()<.1&&!bigBusy&&!agents.some(q=>q.busy)){
       const hit=document.elementFromPoint(mouse.cx,mouse.cy);
       const el=hit&&hit.closest&&hit.closest('[data-b].built');
       if(el&&!el.closest('nav'))await peek(a,el);
@@ -950,11 +950,11 @@ document.getElementById('yr').textContent=new Date().getFullYear();
       if(br){br.x=cur.x;br.y=cur.y;erase(br.x,br.y,26*S,.3)}
       if(br&&st.foamRate>0){
         const n=Math.floor(st.foamRate)+(Math.random()<st.foamRate%1?1:0);
-        for(let i=0;i<n&&foam.length<170;i++){
+        for(let i=0;i<n&&foam.length<230;i++){
           let p=null;
-          if(Math.random()<.72)for(let t=0;t<10;t++){const x=rnd(G.x-14*S,G.x+G.w+14*S),y=rnd(G.y-14*S,G.y+G.h+14*S);if(onGlyph(x,y)){p={x,y};break}}
-          if(!p){const an=rnd(0,6.28),d=Math.sqrt(Math.random())*40*S;p={x:br.x+Math.cos(an)*d,y:br.y+Math.sin(an)*d}}
-          foam.push({x:p.x,y:p.y,r:3+Math.pow(Math.random(),2.3)*17*S,born:now,vx:0,vy:0,hue:rnd(150,330),washed:false,life:0});
+          if(Math.random()<.72)for(let t=0;t<10;t++){const x=rnd(G.x-4*S,G.x+G.w+4*S),y=rnd(G.y-4*S,G.y+G.h+4*S);if(onGlyph(x,y)){p={x,y};break}}
+          if(!p){const an=rnd(0,6.28),d=Math.sqrt(Math.random())*16*S;p={x:br.x+Math.cos(an)*d,y:br.y+Math.sin(an)*d}}
+          foam.push({x:p.x,y:p.y,r:1.5+Math.pow(Math.random(),2.6)*5.5*S,born:now,vx:0,vy:0,hue:rnd(150,330),washed:false,life:0});
         }
       }
       const w=st.wash;
@@ -1098,7 +1098,7 @@ document.getElementById('yr').textContent=new Date().getFullYear();
 
         /* 3 · foam, worked in with a scrubbing motion */
         a.k=10;a.tgt=()=>{const t=NOW()/1000;return P(G.x+G.w*(.5+.55*Math.sin(t*3.1)),G.y+G.h*(.5+.45*Math.sin(t*2.3+1)))};
-        st.brush={x:0,y:0};st.foamRate=2.8;
+        st.brush={x:0,y:0};st.foamRate=3.4;
         await wait(3400);
         st.foamRate=0;a.tgt=()=>{const t=NOW()/1000;return P(G.x+G.w*(.5+.3*Math.sin(t*1.6)),G.y+G.h*(.5+.25*Math.sin(t*1.3)))};
         await wait(700);st.brush=null;
@@ -1374,7 +1374,7 @@ document.getElementById('yr').textContent=new Date().getFullYear();
     const action=A.find(x=>x.id==='shatterFix');
     for(let i=0;i<60;i++){
       const a=agents.find(q=>q.T.id==='motion'&&q.mode==='roam'&&!q.busy);
-      if(a&&!bigBusy&&!buildPending()){
+      if(a&&!bigBusy&&!buildPending()&&!bigBusy&&!agents.some(q=>q.busy)){
         const c=action.pick();
         if(c){last_.shatterFix=NOW();runTask(a,{run:q=>action.run(q,c)},0);return}
       }
@@ -1386,7 +1386,7 @@ document.getElementById('yr').textContent=new Date().getFullYear();
     const action=A.find(x=>x.id==='cleanU');
     for(let i=0;i<40;i++){
       const a=agents.find(q=>q.T.id==='clean');
-      if(a&&a.mode==='roam'&&!a.busy&&!buildPending()){
+      if(a&&a.mode==='roam'&&!a.busy&&!buildPending()&&!bigBusy&&!agents.some(q=>q.busy)){
         const c=action.pick();
         if(c){last_.cleanU=NOW();runTask(a,{run:q=>action.run(q,c)},0);return}
       }
@@ -1428,11 +1428,11 @@ document.getElementById('yr').textContent=new Date().getFullYear();
     for(;;){
       await wait(rnd(3500,8500));
       try{
-        if(document.hidden||buildPending())continue;
+        if(document.hidden||buildPending()||bigBusy||agents.some(q=>q.busy))continue;
         for(let i=defects.length-1;i>=0;i--){if(NOW()-defects[i].t>50000){defects[i].drop();defects.splice(i,1)}}
         const roamers=agents.filter(a=>a.mode==='roam'&&!a.busy);
         if(roamers.length<4)continue;
-        const r=Math.random(),n=r<.6?1:r<.9?2:3,used=new Set();
+        const n=1,used=new Set();
         for(let k=0;k<n;k++){
           const cands=roamers.filter(a=>!used.has(a));if(!cands.length)break;
           let task=null,avoid;
@@ -1451,8 +1451,6 @@ document.getElementById('yr').textContent=new Date().getFullYear();
 
   /* ---------- controls ---------- */
   function finishAll(){all.forEach(reveal)}
-  document.getElementById('demo').addEventListener('click',()=>demoClean());
-  document.getElementById('demo2').addEventListener('click',()=>demoShatter());
   skipBtn.addEventListener('click',()=>{fast=true;finishAll();skipBtn.hidden=true});
   togBtn.addEventListener('click',()=>{const off=layer.style.display==='none';layer.style.display=off?'':'none';togBtn.textContent='Cursors: '+(off?'on':'off')});
   document.getElementById('replay').addEventListener('click',()=>{
