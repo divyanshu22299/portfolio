@@ -302,7 +302,7 @@ exp('scan',{n:3,pick:()=>{const b=document.querySelector('a.btn[download]');if(!
   let cheered=false;await run(T(2600),()=>{const m=mouseP(),mx=m.x-scrollX,my=m.y-scrollY,rr=rc();if(mx>rr.left&&mx<rr.right&&my>rr.top&&my<rr.bottom&&!cheered){cheered=true;A.ring(mx,my,8,100,.8,'255,255,255',2.4);for(let k=0;k<26;k++){const an=rnd(0,TAU),v=rnd(100,320);A.spawn({type:'spark',tr:8,x:mx,y:my,vx:Math.cos(an)*v,vy:Math.sin(an)*v,g:260,drag:1.5,life:.9,size:1.8,col:pick(PCOL)})}}})}});
 
 /* ============================ always-on reactions ============================ */
-const idleNow=()=>!C.isBusy()&&!agents.some(q=>q.busy);
+const idleNow=()=>!C.isBusy()&&!agents.some(q=>q.busy&&!q.sleeping);
 const amb={A:null,get(){if(!this.A||!this.A.alive){this.A=makeArena();this.A.auto=true;this.A.start()}return this.A}};
 function clickBurst(x,y){const A=amb.get();A.ring(x,y,4,74,.7,'170,210,255',2.4);A.ring(x,y,2,40,.5,'255,255,255',1.6);A.spawn({type:'glow',x,y,size:64,life:.35,col:'200,230,255',a:.75});
   for(let i=0;i<22;i++){const an=rnd(0,TAU),v=rnd(80,300);A.spawn({type:'spark',tr:8,x,y,vx:Math.cos(an)*v,vy:Math.sin(an)*v,g:220,drag:1.6,life:rnd(.5,.9),size:1.6,col:pick(PCOL)})}}
@@ -310,7 +310,12 @@ window.__clickBurst=clickBurst;
 addEventListener('pointerdown',e=>{if(e.target.closest&&e.target.closest('#ui,#animMenu,a,button'))return;clickBurst(e.clientX,e.clientY);
   const x=e.clientX+scrollX,y=e.clientY+scrollY,near=agents.filter(q=>q.mode==='roam'&&!q.busy).sort((p,q)=>Math.hypot(p.x-x,p.y-y)-Math.hypot(q.x-x,q.y-y))[0];if(near)hopCursor(near)},{passive:true});
 let sleeping=false;
-setInterval(()=>{if(!sleeping&&mouse.seen&&idleNow()&&NOW()-mouse.t>10000){sleeping=true;session(7,(A,l,team)=>auroraScene(A,team,()=>NOW()-mouse.t>800)).finally(()=>{sleeping=false})}},1000);
+async function passiveSleep(){
+  const sl=shuffle(agents.filter(q=>q.mode==='roam'&&!q.busy)).slice(0,6);if(sl.length<3)return;
+  sleeping=true;const A=makeArena();A.start();sl.forEach(q=>{q.busy=true;q.mode='work';q.sleeping=true});hot(sl,true);
+  try{await auroraScene(A,sl,()=>NOW()-mouse.t>800)}catch(e){console.error('sleep',e)}
+  finally{hot(sl,false);A.stop();sl.forEach(q=>{q.sleeping=false;q.busy=false;startRoam(q)});sleeping=false}}
+setInterval(()=>{if(!sleeping&&mouse.seen&&idleNow()&&NOW()-mouse.t>10000)passiveSleep()},1000);
 const KON=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];let kp=0,typed='';
 addEventListener('keydown',e=>{const k=e.key.length===1?e.key.toLowerCase():e.key;
   kp=(k===KON[kp])?kp+1:(k===KON[0]?1:0);if(kp===KON.length){kp=0;if(C.playAct)C.playAct('play_fireworks')}

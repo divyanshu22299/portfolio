@@ -567,7 +567,7 @@ for(const id of ['cleanU','shatterFix']){const act=C.A.find(x=>x.id===id);
   document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
   async function play(id,quiet){
     const act=A.find(x=>x.id===id);if(!act)return false;
-    const busy=()=>C.isBusy()||agents.some(q=>q.busy);
+    const busy=()=>C.isBusy()||agents.some(q=>q.busy&&!q.sleeping);
     if(!quiet)toast(busy()?`Queued: ${label(id)}`:`Playing: ${label(id)}`);
     for(let i=0;i<300&&busy();i++)await wait(250);
     document.querySelectorAll('[data-type]').forEach(e=>e._busy=0);

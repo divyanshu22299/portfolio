@@ -580,7 +580,7 @@ document.getElementById('yr').textContent=new Date().getFullYear();
     const r=Math.random(),idleMs=NOW()-mouse.t;
     if(r<.07){a.rad=rnd(70,240);a.spin=rnd(.1,.42)*(Math.random()<.5?-1:1);if(Math.random()<.25)a.style=pick(['orbit','perch','trail'])}
     if(r>.9&&r<.96)a.talk(Math.random()<.5?pick(QUIRK[a.T.id]):pick(CHAT),1700);
-    if(mouse.seen&&idleMs>1800&&idleMs<9000&&a.curious>.45&&Math.random()<.1&&!bigBusy&&!agents.some(q=>q.busy)){
+    if(mouse.seen&&idleMs>1800&&idleMs<9000&&a.curious>.45&&Math.random()<.1&&!bigBusy&&!agents.some(q=>q.busy&&!q.sleeping)){
       const hit=document.elementFromPoint(mouse.cx,mouse.cy);
       const el=hit&&hit.closest&&hit.closest('[data-b].built');
       if(el&&!el.closest('nav'))await peek(a,el);
@@ -1381,7 +1381,7 @@ document.getElementById('yr').textContent=new Date().getFullYear();
     const action=A.find(x=>x.id==='shatterFix');
     for(let i=0;i<60;i++){
       const a=agents.find(q=>q.T.id==='motion'&&q.mode==='roam'&&!q.busy);
-      if(a&&!bigBusy&&!buildPending()&&!bigBusy&&!agents.some(q=>q.busy)){
+      if(a&&!bigBusy&&!buildPending()&&!bigBusy&&!agents.some(q=>q.busy&&!q.sleeping)){
         const c=action.pick();
         if(c){last_.shatterFix=NOW();runTask(a,{run:q=>action.run(q,c)},0);return}
       }
@@ -1396,7 +1396,7 @@ document.getElementById('yr').textContent=new Date().getFullYear();
     const action=A.find(x=>x.id==='cleanU');
     for(let i=0;i<40;i++){
       const a=agents.find(q=>q.T.id==='clean');
-      if(a&&a.mode==='roam'&&!a.busy&&!buildPending()&&!bigBusy&&!agents.some(q=>q.busy)){
+      if(a&&a.mode==='roam'&&!a.busy&&!buildPending()&&!bigBusy&&!agents.some(q=>q.busy&&!q.sleeping)){
         const c=action.pick();
         if(c){last_.cleanU=NOW();runTask(a,{run:q=>action.run(q,c)},0);return}
       }
@@ -1430,7 +1430,7 @@ document.getElementById('yr').textContent=new Date().getFullYear();
   }
   async function runTask(a,t,delay){
     a.busy=true;a.mode='work';
-    try{await wait(delay);await t.run(a)}catch(e){console.error(e)}
+    let to=0;try{await wait(delay);await Promise.race([t.run(a),new Promise(res=>{to=setTimeout(()=>{bigBusy=false;res()},60000)})])}catch(e){console.error(e)}clearTimeout(to);
     a.lastAct=NOW();a.busy=false;a.hideSel();startRoam(a);
   }
   async function director(){
@@ -1438,7 +1438,7 @@ document.getElementById('yr').textContent=new Date().getFullYear();
     for(;;){
       await wait(rnd(7000,14000));
       try{
-        if(document.hidden||buildPending()||bigBusy||agents.some(q=>q.busy))continue;
+        if(document.hidden||buildPending()||bigBusy||agents.some(q=>q.busy&&!q.sleeping))continue;
         for(let i=defects.length-1;i>=0;i--){if(NOW()-defects[i].t>50000){defects[i].drop();defects.splice(i,1)}}
         const roamers=agents.filter(a=>a.mode==='roam'&&!a.busy);
         if(roamers.length<4)continue;
