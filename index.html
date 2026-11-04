@@ -606,6 +606,7 @@ document.getElementById('yr').textContent=new Date().getFullYear();
   const inView=e=>{const r=e.getBoundingClientRect();return r.bottom>70&&r.top<innerHeight-40};
   const blockish=e=>getComputedStyle(e).display!=='inline'&&!e.matches('.rule,.vline,.dot,#progress,.ln,.strip');
 
+  const isBig=e=>parseFloat(getComputedStyle(e).fontSize)>=36;
   function wordsOf(el){
     const out=[];let cur=[];
     for(const c of el.querySelectorAll('.ch')){
@@ -616,7 +617,7 @@ document.getElementById('yr').textContent=new Date().getFullYear();
     return out;
   }
   function pickWord(min=3,max=14){
-    const els=shuffle(all.filter(e=>isText(e)&&e.classList.contains('built')&&!e.closest('nav')&&inView(e)&&!(e._busy>NOW())));
+    const els=shuffle(all.filter(e=>isText(e)&&isBig(e)&&e.classList.contains('built')&&!e.closest('nav')&&inView(e)&&!(e._busy>NOW())));
     for(const el of els.slice(0,8)){
       const ws=shuffle(wordsOf(el).filter(w=>w.length>=min&&w.length<=max));
       for(const w of ws){
@@ -637,7 +638,7 @@ document.getElementById('yr').textContent=new Date().getFullYear();
     if(!cand.length)return null;x.i=pick(cand);return x;
   }
   function pickElem(){
-    const els=shuffle(all.filter(e=>e.classList.contains('built')&&!e.closest('nav')&&inView(e)&&blockish(e)&&e.offsetWidth>60&&e.offsetHeight>16&&!(e._busy>NOW())));
+    const els=shuffle(all.filter(e=>e.classList.contains('built')&&!e.closest('nav')&&inView(e)&&isText(e)&&isBig(e)&&blockish(e)&&e.offsetWidth>60&&e.offsetHeight>16&&!(e._busy>NOW())));
     if(!els.length)return null;els[0]._busy=NOW()+6000;return{el:els[0]};
   }
   const wb=w=>{const rs=w.map(pageRect);const l=rs[0].l,t=Math.min(...rs.map(r=>r.t)),b=Math.max(...rs.map(r=>r.t+r.h));return{l,t,w:rs[rs.length-1].l+rs[rs.length-1].w-l,h:b-t}};
@@ -1429,7 +1430,7 @@ document.getElementById('yr').textContent=new Date().getFullYear();
   async function director(){
     await wait(5000);
     for(;;){
-      await wait(rnd(3500,8500));
+      await wait(rnd(7000,14000));
       try{
         if(document.hidden||buildPending()||bigBusy||agents.some(q=>q.busy))continue;
         for(let i=defects.length-1;i>=0;i--){if(NOW()-defects[i].t>50000){defects[i].drop();defects.splice(i,1)}}

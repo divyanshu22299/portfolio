@@ -11,7 +11,7 @@ const who=o=>Object.assign({type:0,layout:0,motion:0,polish:0,qa:0,clean:0},o);
 
 /* ---------- pick a big letter or word ---------- */
 function targets(kind){
-  const els=shuffle([...document.querySelectorAll('.g1,.g2,h2')].filter(e=>e.classList.contains('built')&&inView(e)&&!(e._busy>NOW())));
+  const els=shuffle([...document.querySelectorAll('[data-type]')].filter(e=>e.classList.contains('built')&&parseFloat(getComputedStyle(e).fontSize)>=36&&inView(e)&&!(e._busy>NOW())));
   const ok=c=>{const r=c.getBoundingClientRect();return r.width>16&&r.height>34&&r.top>76&&r.bottom<innerHeight-30&&c.textContent.trim()};
   for(const el of els){
     const chars=[...el.querySelectorAll('.ch.on')];
@@ -515,6 +515,9 @@ fx('radar',{kind:'word',who:who({qa:6}),async run(S,a){
     c.save();c.globalAlpha=al;c.globalCompositeOperation='lighter';for(let i=0;i<E.length;i++){const s=seen[i];if(s>.02){c.fillStyle=`rgba(120,255,170,${s})`;c.fillRect(E[i].x-1.3,E[i].y-1.3,2.6,2.6);if(s>.9&&Math.random()<.03)S.star(c,E[i].x,E[i].y,7*K,1)}}c.restore()});
   await lead(S);S.follow(()=>({x:G.cx+Math.cos(ang)*R*.8,y:G.cy+Math.sin(ang)*R*.8}),8);await S.tw(700,k=>al=k);await S.tw(5200,k=>ang=k*TAU*2.3);await S.tw(900,k=>al=1-k)}});
 
+/* the two older showcase scenes use the same big-letter targets as the new ones */
+for(const id of ['cleanU','shatterFix']){const act=C.A.find(x=>x.id===id);
+  if(act)act.pick=()=>{if(C.isBusy()||(window.__fxHold&&!window.__fxManual)||!C.gapOK())return null;const t=targets('char');return t&&{c:t.chars[0],el:t.el}}}
 /* ---------- Animations menu: play any scene or effect on demand ---------- */
 (()=>{
   const {agents,A,wait,NOW}=C;
@@ -554,7 +557,7 @@ fx('radar',{kind:'word',who:who({qa:6}),async run(S,a){
     const busy=()=>C.isBusy()||agents.some(q=>q.busy);
     toast(busy()?`Queued: ${label(id)}`:`Playing: ${label(id)}`);
     for(let i=0;i<300&&busy();i++)await wait(250);
-    document.querySelectorAll('.g1,.g2,h2').forEach(e=>e._busy=0);
+    document.querySelectorAll('[data-type]').forEach(e=>e._busy=0);
     window.__fxManual=true;let ctx=null;try{ctx=act.pick()}finally{window.__fxManual=false}
     if(!ctx){toast('Nothing suitable on screen. Scroll to a big headline and try again.');return}
     const pool=agents.filter(q=>q.mode==='roam'&&!q.busy);if(!pool.length){toast('Cursors are busy, try again in a moment.');return}
