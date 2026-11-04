@@ -71,6 +71,8 @@ a{color:inherit}
 .scene{position:absolute;pointer-events:none;z-index:3}
 .spot{position:absolute;pointer-events:none;z-index:1;opacity:0;transition:opacity .9s ease}
 .night .cur::before{content:'';position:absolute;left:-20px;top:-20px;width:60px;height:60px;border-radius:50%;background:radial-gradient(circle,rgba(255,205,110,.32),rgba(255,205,110,0) 68%);pointer-events:none}
+#cursorsFixed{position:fixed;left:0;top:0;width:100%;height:100%;z-index:100;pointer-events:none;overflow:hidden}
+.cur.hot .ic{filter:drop-shadow(0 0 5px rgba(255,255,255,.95)) drop-shadow(0 0 12px rgba(110,180,255,.85))}
 #ui{position:fixed;right:16px;bottom:16px;z-index:120;display:flex;gap:8px}
 #ui button,#replay{font:500 13px 'Inter';color:#fff;background:rgba(20,20,20,.88);border:1px solid #333;border-radius:999px;padding:9px 15px;cursor:pointer;backdrop-filter:blur(8px)}
 #ui button:hover,#replay:hover{border-color:var(--red)}
@@ -375,6 +377,7 @@ document.getElementById('yr').textContent=new Date().getFullYear();
 
 (()=>{
   const layer=document.getElementById('cursors');
+  const flayer=document.createElement('div');flayer.id='cursorsFixed';document.body.appendChild(flayer);
   const skipBtn=document.getElementById('skip'),togBtn=document.getElementById('toggle');
   const reduced=matchMedia('(prefers-reduced-motion:reduce)').matches;
   let fast=reduced;
@@ -445,7 +448,7 @@ document.getElementById('yr').textContent=new Date().getFullYear();
     el.innerHTML=`<div class="ic" style="transform:translate(${-T.hot[0]}px,${-T.hot[1]}px)">${T.svg(T.color)}</div><span class="lbl" style="background:#fff;color:#111"></span>`;
     const sel=document.createElement('div');sel.className='sel';sel.style.borderColor='#3b9cff';sel.style.color='#3b9cff';sel.style.background='rgba(59,156,255,.07)';
     sel.innerHTML='<i></i><i></i><i></i><i></i><b></b>';sel.querySelector('b').style.background='#3b9cff';
-    layer.append(sel,el);
+    layer.append(sel);flayer.append(el);
     const style=pick(['orbit','orbit','orbit','orbit','orbit','trail','perch','perch']);
     const a={id:i,T,base:`${T.name} ${n}`,el,sel,selB:sel.querySelector('b'),lbl:el.querySelector('.lbl'),
       x:innerWidth+80+rnd(0,160),y:scrollY+rnd(80,innerHeight-80),gx:0,gy:0,tgt:null,
@@ -456,7 +459,7 @@ document.getElementById('yr').textContent=new Date().getFullYear();
     a.go=(fn,max=2200)=>{a.k=a.kb;a.tgt=fn;const p=fn();const dx=p.x-a.x,dy=p.y-a.y,d=Math.hypot(dx,dy)||1;
       a.d0=d;a.px=-dy/d;a.py=dx/d;a.bend=(Math.random()<.5?-1:1)*rnd(.05,.16);
       return until(()=>Math.hypot(a.gx-a.x,a.gy-a.y)<6,max)};
-    a.talk=(txt,ms=1500)=>{if(window.__sfx)window.__sfx.say(a,String(txt));a.lbl.textContent=a.base+' · '+txt;const s=++a.say;setTimeout(()=>{if(a.say===s)a.lbl.textContent=a.base},ms)};
+    a.talk=(txt,ms=1500)=>{a.lbl.textContent=a.base+' · '+txt;const s=++a.say;setTimeout(()=>{if(a.say===s)a.lbl.textContent=a.base},ms)};
     a.showSel=(el,tag)=>{const r=pageRect(el);a.selEl=el;a.selP=0;a.selGrow=true;a.selB.textContent=tag||`${Math.round(r.w)} × ${Math.round(r.h)}`;a.sel.style.opacity=1};
     a.hideSel=()=>{a.sel.style.opacity=0;setTimeout(()=>{if(a.sel.style.opacity==='0')a.selEl=null},260)};
     agents.push(a);return a;
@@ -497,7 +500,7 @@ document.getElementById('yr').textContent=new Date().getFullYear();
       const prog=a.d0>1?clamp(1-rem/a.d0,0,1):1;
       const bend=a.bend*Math.sin(Math.PI*prog)*Math.min(a.d0,700);
       const sw=Math.sin(now/650+a.id*2.1)*1.4;
-      a.el.style.transform=`translate3d(${a.x+a.px*bend+sw}px,${a.y+a.py*bend+sw}px,0)`;
+      a.el.style.transform=`translate3d(${a.x+a.px*bend+sw-scrollX}px,${a.y+a.py*bend+sw-scrollY}px,0)`;
       if(a.selEl&&a.sr){
         if(a.selGrow)a.selP=Math.min(1,a.selP+dt/.32);
         const e=ease(a.selP),s=a.sel.style;
@@ -507,16 +510,18 @@ document.getElementById('yr').textContent=new Date().getFullYear();
     requestAnimationFrame(frame);
   }
 
+  let lsx=scrollX,lsy=scrollY;
+  addEventListener('scroll',()=>{const dx=scrollX-lsx,dy=scrollY-lsy;lsx=scrollX;lsy=scrollY;if(!dx&&!dy)return;for(const a of agents)if(a.mode==='roam'&&!a.busy){a.x+=dx;a.y+=dy;a.gx+=dx;a.gy+=dy}},{passive:true});
   /* ---------- building ---------- */
   const isText=el=>el.dataset.type!==undefined;
   const ready=el=>!el.classList.contains('built')&&!el._claim&&!(el.parentElement&&el.parentElement.closest('[data-b]:not(.built)'));
   const inRange=r=>!(r.t+r.h<scrollY||r.t>scrollY+innerHeight-30);
+  const crect=el=>{const n=NOW();if(!el._pr||n-el._pt>1500){el._pr=pageRect(el);el._pt=n}return el._pr};
   function pickBuild(a){
     const vc=scrollY+innerHeight*.45;let best=null,bs=1e12;
     for(const el of all){
       if(!ready(el))continue;
-      const r=pageRect(el);
-      if(!inRange(r))continue;
+      const r=crect(el);if(!inRange(r))continue;
       let d=Math.abs(r.t+r.h/2-vc);
       const want=a.T.pref;
       if(want==='text'&&!isText(el))d+=450;
@@ -526,7 +531,7 @@ document.getElementById('yr').textContent=new Date().getFullYear();
     }
     return best;
   }
-  const buildPending=()=>all.some(el=>ready(el)&&inRange(pageRect(el)));
+  const buildPending=()=>all.some(el=>ready(el)&&inRange(crect(el)));
   const corner=(el,a)=>()=>{const r=pageRect(el),e=ease(a.selP);return{x:r.l+r.w*e,y:r.t+r.h*e}};
   const topLeft=el=>()=>{const r=pageRect(el);return{x:r.l+3,y:r.t+3}};
 
@@ -536,7 +541,7 @@ document.getElementById('yr').textContent=new Date().getFullYear();
     const dt=Math.min(1800,260+n*26)/ticks;
     let i=0;
     a.go(()=>{const c=chars[Math.min(i,n-1)],r=pageRect(c);return{x:r.l+r.w,y:r.t+r.h*.55}},1);
-    for(i=0;i<n;i++){chars[i].classList.add('on');if(i%5===0&&window.__sfx)window.__sfx.pip(a);if(i%per===0)await sleep(dt)}
+    for(i=0;i<n;i++){chars[i].classList.add('on');if(i%per===0)await sleep(dt)}
   }
   async function build(a,el){
     el._claim=1;
@@ -1425,7 +1430,7 @@ document.getElementById('yr').textContent=new Date().getFullYear();
   }
   async function runTask(a,t,delay){
     a.busy=true;a.mode='work';
-    try{await wait(delay);if(window.__sfx)window.__sfx.play('start',a);await t.run(a)}catch(e){console.error(e)}if(window.__sfx)window.__sfx.play('end',a);
+    try{await wait(delay);await t.run(a)}catch(e){console.error(e)}
     a.lastAct=NOW();a.busy=false;a.hideSel();startRoam(a);
   }
   async function director(){
@@ -1457,7 +1462,7 @@ document.getElementById('yr').textContent=new Date().getFullYear();
   /* ---------- controls ---------- */
   function finishAll(){all.forEach(reveal)}
   skipBtn.addEventListener('click',()=>{fast=true;finishAll();skipBtn.hidden=true});
-  togBtn.addEventListener('click',()=>{const off=layer.style.display==='none';layer.style.display=off?'':'none';togBtn.textContent='Cursors: '+(off?'on':'off')});
+  togBtn.addEventListener('click',()=>{const off=layer.style.display==='none';layer.style.display=off?'':'none';flayer.style.display=layer.style.display;togBtn.textContent='Cursors: '+(off?'on':'off')});
   document.getElementById('replay').addEventListener('click',()=>{
     clearDefects();layer.querySelectorAll('.pin,.gho,.spk').forEach(n=>n.remove());
     all.forEach(e=>{e.classList.remove('built','fixing','gh');e._claim=0;e._busy=0;e.style.translate='';e.querySelectorAll('.ch').forEach(c=>c.classList.remove('on','gh'))});
@@ -1467,10 +1472,11 @@ document.getElementById('yr').textContent=new Date().getFullYear();
   setInterval(()=>{if(!all.some(e=>!e.classList.contains('built')))skipBtn.hidden=true},800);
 
   const prog=document.getElementById('progress');
-  addEventListener('scroll',()=>{prog.style.width=(scrollY/Math.max(1,document.documentElement.scrollHeight-innerHeight)*100)+'%'},{passive:true});
+  let docH=document.documentElement.scrollHeight;setInterval(()=>{docH=document.documentElement.scrollHeight},1500);
+  addEventListener('scroll',()=>{prog.style.width=(scrollY/Math.max(1,docH-innerHeight)*100)+'%'},{passive:true});
 
   /* ---------- go ---------- */
-  if(reduced){finishAll();layer.style.display='none';togBtn.hidden=true;skipBtn.hidden=true;return}
+  if(reduced){finishAll();layer.style.display='none';flayer.style.display='none';togBtn.hidden=true;skipBtn.hidden=true;return}
   (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>setTimeout(()=>{
     const counts={};
     ROSTER.forEach((id,i)=>{counts[id]=(counts[id]||0)+1;makeAgent(id,counts[id],i)});
