@@ -1062,7 +1062,7 @@ document.getElementById('yr').textContent=new Date().getFullYear();
 
   act('cleanU',{cd:45000,w:3,who:{clean:10,type:0,layout:0,motion:0,polish:0,qa:0},
     pick:()=>{
-      if(bigBusy)return null;
+      if(bigBusy||window.__fxHold)return null;
       const g=document.querySelector('.g1');
       if(g&&g.classList.contains('built')&&inView(g)&&!(g._busy>NOW())){
         const cs=[...g.querySelectorAll('.ch.on')].filter(c=>c.textContent.trim());
@@ -1299,7 +1299,7 @@ document.getElementById('yr').textContent=new Date().getFullYear();
 
   act('shatterFix',{cd:70000,w:2,who:{motion:9,layout:3,polish:1,type:0,qa:0,clean:0},
     pick:()=>{
-      if(bigBusy)return null;
+      if(bigBusy||window.__fxHold)return null;
       const gs=shuffle([...document.querySelectorAll('.g1,.g2')].filter(g=>g.classList.contains('built')&&inView(g)&&!(g._busy>NOW())));
       for(const g of gs){
         const cs=[...g.querySelectorAll('.ch.on')].filter(c=>c.textContent.trim()&&c.getBoundingClientRect().width>20&&c.getBoundingClientRect().height>70);
@@ -1382,6 +1382,9 @@ document.getElementById('yr').textContent=new Date().getFullYear();
     }
   }
 
+  let lastBigEnd=0;
+  window.__fxCore={layer,agents,A,act,rnd,clamp,wait,tween,ease,NOW,pageRect,glyphInfo,inView,shuffle,pick,startRoam,
+    isBusy:()=>bigBusy,lock:()=>{bigBusy=true},unlock:()=>{bigBusy=false;lastBigEnd=NOW()},gapOK:()=>!window.__fxHold&&NOW()-lastBigEnd>(window.__fxSpeed&&window.__fxSpeed<1?0:9000)};
   async function demoClean(){
     const action=A.find(x=>x.id==='cleanU');
     for(let i=0;i<40;i++){
@@ -1478,5 +1481,6 @@ document.getElementById('yr').textContent=new Date().getFullYear();
   window.__agents={agents,defects,A};
 })();
 </script>
+<script src="fx.js"></script>
 </body>
 </html>
