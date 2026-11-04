@@ -255,20 +255,6 @@ exp('tractor',{n:1,pick:()=>K.targets('char'),async run(A,a,team,x){
     a.k=5.5;await a.go(()=>({x:home.x,y:home.y-o.h*.9-lift*.3}),3800);await drop(home);await wait(T(700))}
   finally{o.done()}}});
 
-/* ============================ 9 · aurora sleep: they curl into glowing orbs under drifting northern lights ============================ */
-async function auroraScene(A,team,cond){
-  const {W,H}=A;let wake=0;const stars=Array.from({length:70},()=>({a:rnd(0,TAU),r:rnd(40,250),p:rnd(0,TAU),s:rnd(.6,1.8)}));
-  team.forEach((q,i)=>{q.k=1.7;q.tgt=()=>{const m=mouseP(),t=NOW()/1000,an=i*(TAU/team.length)+.4,r=76+(i%3)*30;return{x:m.x+Math.cos(an)*r,y:m.y+Math.sin(an)*r*.6+Math.sin(t*1.2+i)*3}}});
-  A.drw.push(c=>{const m=vp(mouseP());c.save();c.globalCompositeOperation='lighter';
-    for(let b=0;b<3;b++){const col=['110,255,200','150,130,255','110,190,255'][b],g=c.createLinearGradient(0,m.y-190,0,m.y+30);g.addColorStop(0,`rgba(${col},0)`);g.addColorStop(.5,`rgba(${col},${.11*(1-wake)})`);g.addColorStop(1,`rgba(${col},0)`);c.fillStyle=g;c.beginPath();c.moveTo(m.x-240,m.y+30);
-      for(let x=-240;x<=240;x+=12)c.lineTo(m.x+x,m.y-100-b*22+Math.sin(A.t*.7+x*.018+b*2)*34+Math.sin(A.t*.4+x*.01)*20);c.lineTo(m.x+240,m.y+30);c.closePath();c.fill()}
-    for(const s of stars){const x=m.x+Math.cos(s.a)*s.r*1.2,y=m.y+Math.sin(s.a)*s.r*.7-40;c.fillStyle=`rgba(220,230,255,${(.15+.45*Math.abs(Math.sin(A.t*s.s+s.p)))*(1-wake)})`;c.beginPath();c.arc(x,y,1.1,0,TAU);c.fill()}c.restore();
-    team.forEach((q,i)=>{const p=vp(q),br=.5+.5*Math.sin(A.t*1.1+i);A.halo(p.x,p.y,30+9*br,i%2?'150,130,255':'110,190,255',(.3+.18*br)*(1-wake));A.halo(p.x,p.y,12,'255,255,255',.3*(1-wake))})});
-  let lastZ=0;A.upd.push(()=>{if(A.t-lastZ>.7&&wake<.5){lastZ=A.t;const q=pick(team),p=vp(q);A.spawn({type:'text',txt:'Z',font:'italic 700 20px Inter,sans-serif',x:p.x+10,y:p.y-8,vx:14,vy:-26,grow:.35,life:2.4,col:'200,190,255',a:.9,add:false})}});
-  while(cond())await wait(T(300));
-  team.forEach(q=>{const p=vp(q);A.ring(p.x,p.y,6,64,.8,'200,215,255',2);stretch(q)});await ramp(T(700),k=>wake=k)}
-exp('aurora',{n:7,w:.25,async run(A,a,team){const end=NOW()+T(9000);await auroraScene(A,team,()=>NOW()<end)}});
-
 /* ============================ 10 · fireworks finale: rockets, peonies, willows and crackle ============================ */
 exp('fireworks',{n:7,w:.25,async run(A,a,team){
   const {W,H}=A;team.forEach((q,i)=>{q.k=9;q.tgt=()=>V(W*(.12+.76*i/Math.max(1,team.length-1)),H-86+Math.sin(NOW()/500+i)*6)});
@@ -309,13 +295,6 @@ function clickBurst(x,y){const A=amb.get();A.ring(x,y,4,74,.7,'170,210,255',2.4)
 window.__clickBurst=clickBurst;
 addEventListener('pointerdown',e=>{if(e.target.closest&&e.target.closest('#ui,#animMenu,a,button'))return;clickBurst(e.clientX,e.clientY);
   const x=e.clientX+scrollX,y=e.clientY+scrollY,near=agents.filter(q=>q.mode==='roam'&&!q.busy).sort((p,q)=>Math.hypot(p.x-x,p.y-y)-Math.hypot(q.x-x,q.y-y))[0];if(near)hopCursor(near)},{passive:true});
-let sleeping=false;
-async function passiveSleep(){
-  const sl=shuffle(agents.filter(q=>q.mode==='roam'&&!q.busy)).slice(0,6);if(sl.length<3)return;
-  sleeping=true;const A=makeArena();A.start();sl.forEach(q=>{q.busy=true;q.mode='work';q.sleeping=true});hot(sl,true);
-  try{await auroraScene(A,sl,()=>NOW()-mouse.t>800)}catch(e){console.error('sleep',e)}
-  finally{hot(sl,false);A.stop();sl.forEach(q=>{q.sleeping=false;q.busy=false;startRoam(q)});sleeping=false}}
-setInterval(()=>{if(!sleeping&&mouse.seen&&idleNow()&&NOW()-mouse.t>10000)passiveSleep()},1000);
 const KON=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];let kp=0,typed='';
 addEventListener('keydown',e=>{const k=e.key.length===1?e.key.toLowerCase():e.key;
   kp=(k===KON[kp])?kp+1:(k===KON[0]?1:0);if(kp===KON.length){kp=0;if(C.playAct)C.playAct('play_fireworks')}
