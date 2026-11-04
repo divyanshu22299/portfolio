@@ -276,6 +276,7 @@ const hr=new Date().getHours();
 if(hr>=20||hr<6)document.documentElement.classList.add('night');
 if(hr>=6&&hr<10)setInterval(()=>{if(idleNow()&&Math.random()<.5){const q=pick(agents.filter(q=>q.mode==='roam'&&!q.busy));if(q){stretch(q);sfx.play('yawn',q)}}},25000);
 
+C.stretchRandom=()=>{const q=pick(agents.filter(q=>q.mode==='roam'&&!q.busy));if(q){stretch(q);sfx.play('yawn',q)}};
 /* sound toggle */
 (()=>{const ui=document.getElementById('ui');if(!ui)return;const b=document.createElement('button');b.type='button';b.id='sound';
   const paint=()=>{b.textContent='Sound: '+(sfx.on?'on':'off')};paint();

@@ -534,11 +534,11 @@ for(const id of ['cleanU','shatterFix']){const act=C.A.find(x=>x.id===id);
 #fxToast.show{opacity:1}`;
   document.head.appendChild(st);
   const BIG={cleanU:'Cleaning: spray, foam, polish',shatterFix:'Shatter, repair & weld',fx_frost:'Frost & thaw',fx_fire:'Fire & ash',fx_lightning:'Lightning strike',fx_neon:'Neon tube',fx_glitch:'RGB glitch',fx_hologram:'Hologram',fx_liquid:'Liquid fill',fx_ink:'Ink bloom',fx_gold:'Gold leaf',fx_galaxy:'Galaxy window',fx_matrix:'Digital rain',fx_slime:'Slime pour',fx_magma:'Magma cracks',fx_crystal:'Crystal gem',fx_laser:'Laser engraving',fx_embroidery:'Embroidery',fx_disco:'Disco lights',fx_bubble:'Soap bubble',fx_balloon:'Balloon & pop',fx_pixelate:'Pixel wave',fx_snap:'Dust & reform',fx_magnet:'Iron filings',fx_sand:'Sand erosion',fx_confetti:'Confetti popper',fx_bounce:'Rubber bounce',fx_ripple:'Water ripples',fx_flag:'Flag wave',fx_vines:'Vines & flowers',fx_smoke:'Smoke reveal',fx_radar:'Radar sweep'};
-  const PLAY={play_tag:'Tag with your mouse',play_snake:'Follow the leader',play_catchme:'Catch me',play_keepy:'Keepy-uppy ball',play_dance:'Dance floor',play_race:'Cursor race',play_band:'Letter band',play_rps:'Rock-paper-scissors',play_hide:'Hide and seek',play_hunt:'Letter hunt',play_tug:'Tug of war',play_domino:'Domino letters',play_moving:'Moving day',play_resume:'Peek at the résumé',play_sleepy:'Sleepy time',play_dizzy:'Dizzy cursors',play_parade:'Parade',play_hello:'Say hello'};
+  const PLAY={play_tag:'Tag with your mouse',play_snake:'Follow the leader',play_catchme:'Catch me',play_keepy:'Keepy-uppy ball',play_dance:'Dance floor',play_race:'Cursor race',play_band:'Letter band',play_rps:'Rock-paper-scissors',play_hide:'Hide and seek',play_hunt:'Letter hunt',play_tug:'Tug of war',play_domino:'Domino letters',play_moving:'Moving day',play_resume:'Peek at the résumé',play_sleepy:'Sleepy time (also: keep your mouse still)',play_dizzy:'Dizzy cursors (also: scroll very fast)',play_parade:'Parade (also: Konami code)',play_hello:'Say hello (also: type hello)'};
   const pretty=id=>id.replace(/([A-Z])/g,' $1').replace(/^./,c=>c.toUpperCase());
   const label=id=>BIG[id]||PLAY[id]||pretty(id);
   const ui=document.getElementById('ui'),btn=document.createElement('button');
-  btn.type='button';btn.id='anim';btn.setAttribute('aria-haspopup','true');btn.setAttribute('aria-expanded','false');btn.textContent='✦ Animations ▾';
+  btn.type='button';btn.id='anim';btn.setAttribute('aria-haspopup','true');btn.setAttribute('aria-expanded','false');btn.textContent='✦ All animations ▾';
   ui.insertBefore(btn,ui.firstChild);
   const menu=document.createElement('div');menu.id='animMenu';menu.setAttribute('role','menu');document.body.appendChild(menu);
   const toastEl=document.createElement('div');toastEl.id='fxToast';document.body.appendChild(toastEl);
@@ -546,27 +546,39 @@ for(const id of ['cleanU','shatterFix']){const act=C.A.find(x=>x.id===id);
   const close=()=>{menu.classList.remove('open');btn.setAttribute('aria-expanded','false')};
   const add=(h,ids)=>{if(!ids.length)return;const e=document.createElement('h5');e.textContent=`${h} (${ids.length})`;menu.appendChild(e);
     for(const id of ids){const b=document.createElement('button');b.type='button';b.setAttribute('role','menuitem');b.textContent=label(id);b.addEventListener('click',()=>{close();play(id)});menu.appendChild(b)}};
+  const addBtn=(txt,fn,hot)=>{const b=document.createElement('button');b.type='button';b.setAttribute('role','menuitem');b.textContent=txt;if(hot)b.style.color='#ff7a7a';b.addEventListener('click',()=>{close();fn()});menu.appendChild(b)};
+  const head=txt=>{const e=document.createElement('h5');e.textContent=txt;menu.appendChild(e)};
+  let touring=false,stopFlag=false;
+  const allIds=()=>{const ids=A.map(x=>x.id).filter(id=>id!=='fix');return[...Object.keys(BIG).filter(i=>ids.includes(i)),...Object.keys(PLAY).filter(i=>ids.includes(i)),...ids.filter(i=>!BIG[i]&&!PLAY[i])]};
+  async function tour(){if(touring)return;touring=true;stopFlag=false;const ids=allIds();
+    for(let i=0;i<ids.length&&!stopFlag;i++){toast(`Tour ${i+1}/${ids.length}: ${label(ids[i])}`);await play(ids[i],true);await wait(1500)}
+    touring=false;toast(stopFlag?'Tour stopped':'Tour finished')}
+  const stopTour=()=>{stopFlag=true;toast('Stopping after this one…')};
   const build=()=>{menu.textContent='';const ids=A.map(x=>x.id).filter(id=>id!=='fix');
+    head('Everything');addBtn(touring?'■ Stop the tour':`▶ Play everything, one by one (${allIds().length})`,()=>touring?stopTour():tour(),true);
     add('Showcase scenes',Object.keys(BIG).filter(id=>ids.includes(id)));
     add('Cursor play',Object.keys(PLAY).filter(id=>ids.includes(id)));
-    add('Small effects',ids.filter(id=>!BIG[id]&&!PLAY[id]))};
-  btn.addEventListener('click',e=>{e.stopPropagation();if(!menu.classList.contains('open'))build();const open=menu.classList.toggle('open');btn.setAttribute('aria-expanded',String(open));if(window.__sfx)window.__sfx.wake()});
+    head('Reactions & extras');
+    addBtn('Click fireworks (or just click anywhere)',()=>document.body.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,clientX:innerWidth/2,clientY:innerHeight/2})));
+    addBtn('Night lanterns: '+(document.documentElement.classList.contains('night')?'on':'off'),()=>document.documentElement.classList.toggle('night'));
+    addBtn('Morning stretch',()=>C.stretchRandom&&C.stretchRandom());
+    addBtn('Sound: '+((window.__sfx&&window.__sfx.on)?'on':'off'),()=>{const s=document.getElementById('sound');if(s)s.click()});
+    add('Small effects',ids.filter(id=>!BIG[id]&&!PLAY[id]))};  btn.addEventListener('click',e=>{e.stopPropagation();if(!menu.classList.contains('open'))build();const open=menu.classList.toggle('open');btn.setAttribute('aria-expanded',String(open));if(window.__sfx)window.__sfx.wake()});
   document.addEventListener('click',e=>{if(!menu.contains(e.target)&&e.target!==btn)close()});
   document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
-  async function play(id){
-    const act=A.find(x=>x.id===id);if(!act)return;
+  async function play(id,quiet){
+    const act=A.find(x=>x.id===id);if(!act)return false;
     const busy=()=>C.isBusy()||agents.some(q=>q.busy);
-    toast(busy()?`Queued: ${label(id)}`:`Playing: ${label(id)}`);
+    if(!quiet)toast(busy()?`Queued: ${label(id)}`:`Playing: ${label(id)}`);
     for(let i=0;i<300&&busy();i++)await wait(250);
     document.querySelectorAll('[data-type]').forEach(e=>e._busy=0);
     window.__fxManual=true;let ctx=null;try{ctx=act.pick()}finally{window.__fxManual=false}
-    if(!ctx){toast('Nothing suitable on screen. Scroll to a big headline and try again.');return}
-    const pool=agents.filter(q=>q.mode==='roam'&&!q.busy);if(!pool.length){toast('Cursors are busy, try again in a moment.');return}
+    if(!ctx){if(!quiet)toast('Nothing suitable on screen. Scroll to a big headline and try again.');return false}
+    const pool=agents.filter(q=>q.mode==='roam'&&!q.busy);if(!pool.length){if(!quiet)toast('Cursors are busy, try again in a moment.');return false}
     const ws=pool.map(q=>{const w=act.who&&act.who[q.T.id];return w===undefined?(act.who&&Object.keys(act.who).length?.2:1):w});
     const tot=ws.reduce((s,v)=>s+v,0);let r=Math.random()*(tot||1),a=pool[pool.length-1];
     if(tot>0)for(let i=0;i<pool.length;i++){r-=ws[i];if(r<=0){a=pool[i];break}}
-    toast(`Playing: ${label(id)}`);C.runTask(a,{run:q=>act.run(q,ctx)},0);
-  }
-  C.playAct=play;
+    if(!quiet)toast(`Playing: ${label(id)}`);await C.runTask(a,{run:q=>act.run(q,ctx)},0);return true;
+  }  C.playAct=play;
 })();
 })();
