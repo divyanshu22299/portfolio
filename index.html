@@ -206,14 +206,14 @@ footer{border-top:1px solid #1a1a1a;padding:34px 0 60px;text-align:center;color:
     <span class="script" data-b data-type>Hello, I'm</span>
     <h1><span class="g1" data-b data-type>Divyanshu</span><span class="g2" data-b data-type>Singh Chouhan</span></h1>
     <span class="role" data-b data-type>FULL-STACK DEVELOPER &amp; AI PRODUCT BUILDER</span>
-    <p class="pitch" data-b data-type>I ship production software through prompt-driven development. I designed and built an AI translation platform that a real team uses every single day.</p>
+    <p class="pitch" data-b data-type>I ship production software through prompt-driven development. I designed and built Centroid, an AI translation platform, and Noun, a transcription and subtitle studio, for a real localisation team.</p>
     <div class="btns">
       <a class="btn red" href="#work" data-b data-fx="rise">See my work</a>
       <a class="btn" href="Divyanshu_Singh_Chouhan_Resume_Developer.docx" download data-b data-fx="rise">Download résumé</a>
     </div>
     <div class="stats">
       <div data-b data-fx="rise"><b>30+</b><small>languages supported</small></div>
-      <div data-b data-fx="rise"><b>01</b><small>platform built solo, live</small></div>
+      <div data-b data-fx="rise"><b>02</b><small>products shipped at Verbolabs</small></div>
       <div data-b data-fx="rise"><b>3-pass</b><small>AI quality scoring</small></div>
     </div>
   </div>
@@ -225,7 +225,7 @@ footer{border-top:1px solid #1a1a1a;padding:34px 0 60px;text-align:center;color:
       <div class="ln" data-b data-type><span class="k">languages</span>30+, format preserved</div>
       <div class="ln" data-b data-type><span class="k">quality</span>MQM · 3-pass AI scoring</div>
       <div class="ln" data-b data-type><span class="k">portals</span>linguist · coordinator</div>
-      <div class="ln" data-b data-type><span class="k">stack</span>Node · React · Supabase</div>
+      <div class="ln" data-b data-type><span class="k">stack</span>React · FastAPI · Postgres</div>
       <div class="ln" data-b data-type><span class="k">status</span><span class="g">● live</span> @ Verbolabs</div>
       <div class="ln" data-b data-type><span class="k">built by</span><span class="r">one developer</span></div>
     </div>
@@ -237,8 +237,8 @@ footer{border-top:1px solid #1a1a1a;padding:34px 0 60px;text-align:center;color:
 </header>
 
 <div class="strip" data-b data-fx="wipe"><div class="track">
-  <span>Node.js</span><span>React</span><span>Supabase</span><span>OpenAI API</span><span>Socket.io</span><span>MongoDB</span><span>SAP ABAP</span><span>SAP HANA</span><span>Express</span>
-  <span>Node.js</span><span>React</span><span>Supabase</span><span>OpenAI API</span><span>Socket.io</span><span>MongoDB</span><span>SAP ABAP</span><span>SAP HANA</span><span>Express</span>
+  <span>React</span><span>FastAPI</span><span>Python</span><span>PostgreSQL</span><span>Socket.io</span><span>OpenAI API</span><span>Gemini</span><span>FFmpeg</span><span>Node.js</span>
+  <span>React</span><span>FastAPI</span><span>Python</span><span>PostgreSQL</span><span>Socket.io</span><span>OpenAI API</span><span>Gemini</span><span>FFmpeg</span><span>Node.js</span>
 </div></div>
 
 <section id="work"><div class="wrap">
@@ -253,16 +253,33 @@ footer{border-top:1px solid #1a1a1a;padding:34px 0 60px;text-align:center;color:
       <h3 data-b data-type>Centroid</h3>
       <p data-b data-type>Centroid is an AI-driven computer-assisted translation (CAT) platform that I designed and built solo, from empty repo to daily production use at Verbolabs.</p>
       <ul>
-        <li data-b data-type>Translates documents across <b>30+ languages</b> while preserving original formatting, across multiple file types.</li>
+        <li data-b data-type>Translates documents across <b>30+ languages</b> while preserving original layout and formatting, across DOCX, PDF, IDML, PPTX, XLSX, HTML, XLIFF and more, with a live preview beside the editor.</li>
         <li data-b data-type>Dual-portal, role-based design: a <b>linguist workspace</b> and a <b>coordinator portal</b> for assigning files and tracking delivery.</li>
         <li data-b data-type>Custom <b>MQM quality evaluation</b>: segment- and document-level AI scoring with a GEMBA-MQM-style three-shot prompt and strict JSON schema outputs.</li>
-        <li data-b data-type><b>Hybrid latency model</b>: single-pass scoring for live edits, full three-pass for background audits, run as async, concurrency-limited jobs with live progress over Socket.io and crash-safe persistence in Supabase.</li>
-        <li data-b data-type>Glossary management, context-aware AI translation, content-hash caching and a golden-set CLI for regression testing.</li>
+        <li data-b data-type><b>Hybrid latency model</b>: single-pass scoring for live edits, full three-pass for background audits, run as async, concurrency-limited jobs with live progress over Socket.IO and crash-safe persistence in PostgreSQL.</li>
+        <li data-b data-type>Translation memory with fuzzy matching, termbase and glossary management, context-aware AI translation, content-hash caching and a golden-set CLI for regression testing.</li>
+        <li data-b data-type>A GitHub connector for software localisation files and an MCP server so AI assistants can work with projects.</li>
       </ul>
-      <div class="chips"><span class="chip" data-b data-fx="rise">Node.js</span><span class="chip" data-b data-fx="rise">Express</span><span class="chip" data-b data-fx="rise">React</span><span class="chip" data-b data-fx="rise">Supabase</span><span class="chip" data-b data-fx="rise">Socket.io</span><span class="chip" data-b data-fx="rise">OpenAI API</span><span class="chip" data-b data-fx="rise">Structured Outputs</span></div>
+      <div class="chips"><span class="chip" data-b data-fx="rise">Python</span><span class="chip" data-b data-fx="rise">FastAPI</span><span class="chip" data-b data-fx="rise">React</span><span class="chip" data-b data-fx="rise">PostgreSQL</span><span class="chip" data-b data-fx="rise">Redis</span><span class="chip" data-b data-fx="rise">Socket.IO</span><span class="chip" data-b data-fx="rise">OpenAI API</span><span class="chip" data-b data-fx="rise">Structured Outputs</span></div>
     </div>
   </article>
-
+  <div class="rule" data-b data-fx="wipe"></div>
+  <article class="work">
+    <div class="num" data-b data-type>02</div>
+    <div>
+      <span class="badge" data-b data-fx="fade">BUILT AT VERBOLABS</span>
+      <h3 data-b data-type>Noun</h3>
+      <p data-b data-type>Noun is a transcription and subtitle studio for broadcast-grade subtitles, built for Hindi, Hinglish and other Indic languages.</p>
+      <ul>
+        <li data-b data-type>Two tools behind one sign-in, a <b>Subtitle Studio</b> and a <b>Transcription Studio</b>, plus an admin dashboard for users, quotas and audit logs.</li>
+        <li data-b data-type>A streamed pipeline: media preparation, word-level timing, <b>speaker diarization</b> and audio-event tags from ElevenLabs Scribe v2, then a local engine builds subtitle cards that follow the <b>Netflix Timed Text Style Guide</b> and reports a QC compliance score.</li>
+        <li data-b data-type>Native-script enforcement, such as turning English loanwords into Devanagari, with optional <b>Gemini</b> proofreading and automatic QC fixes.</li>
+        <li data-b data-type>A waveform editor with drag-to-retime cards, re-sync to speech, find and replace and a command palette, exporting to SRT, WebVTT, TTML, TXT, Excel, CSV and Word.</li>
+        <li data-b data-type>Subtitles can be translated through Centroid with translation QC, and coordinators can share a project with linguists for review.</li>
+      </ul>
+      <div class="chips"><span class="chip" data-b data-fx="rise">Python</span><span class="chip" data-b data-fx="rise">FastAPI</span><span class="chip" data-b data-fx="rise">React</span><span class="chip" data-b data-fx="rise">PostgreSQL</span><span class="chip" data-b data-fx="rise">ElevenLabs Scribe</span><span class="chip" data-b data-fx="rise">Gemini</span><span class="chip" data-b data-fx="rise">FFmpeg</span><span class="chip" data-b data-fx="rise">WaveSurfer.js</span></div>
+    </div>
+  </article>
   <div class="rule" data-b data-fx="wipe"></div>
 </div></section>
 
@@ -291,7 +308,7 @@ footer{border-top:1px solid #1a1a1a;padding:34px 0 60px;text-align:center;color:
     <div class="tl"><div class="vline" data-b data-fx="fade"></div>
       <div class="it"><i class="dot" data-b data-fx="fade"></i>
         <h3 data-b data-type>Project Coordinator, Localisation</h3><div class="meta" data-b data-type>Verbolabs, Udaipur · Dec 2025 – Present</div>
-        <p data-b data-type>Designed and built the company's AI-driven localisation platform while managing end-to-end delivery of multilingual content projects.</p>
+        <p data-b data-type>Designed and built the company's AI localisation products, Centroid (a CAT platform) and Noun (a transcription and subtitle studio), while managing end-to-end delivery of multilingual content projects.</p>
         <p data-b data-type>Coordinated translators, subtitlers, editors and QA teams; owned timelines, task allocation and delivery tracking across concurrent projects.</p></div>
     </div>
     <div class="tl"><div class="vline" data-b data-fx="fade"></div>
@@ -306,7 +323,7 @@ footer{border-top:1px solid #1a1a1a;padding:34px 0 60px;text-align:center;color:
   <div class="rule" data-b data-fx="wipe"></div>
   <div class="skillrow"><h4 data-b data-type>AI &amp; LLM engineering</h4><div class="chips"><span class="chip" data-b data-fx="rise">Prompt Engineering</span><span class="chip" data-b data-fx="rise">AI-Assisted Development</span><span class="chip" data-b data-fx="rise">OpenAI API</span><span class="chip" data-b data-fx="rise">Structured Outputs</span><span class="chip" data-b data-fx="rise">LLM Evaluation Pipelines</span></div></div>
   <div class="rule" data-b data-fx="wipe"></div>
-  <div class="skillrow"><h4 data-b data-type>Backend</h4><div class="chips"><span class="chip" data-b data-fx="rise">Node.js</span><span class="chip" data-b data-fx="rise">Express</span><span class="chip" data-b data-fx="rise">Supabase</span><span class="chip" data-b data-fx="rise">Socket.io</span><span class="chip" data-b data-fx="rise">MongoDB</span><span class="chip" data-b data-fx="rise">REST &amp; OData</span></div></div>
+  <div class="skillrow"><h4 data-b data-type>Backend</h4><div class="chips"><span class="chip" data-b data-fx="rise">Python</span><span class="chip" data-b data-fx="rise">FastAPI</span><span class="chip" data-b data-fx="rise">PostgreSQL</span><span class="chip" data-b data-fx="rise">Redis</span><span class="chip" data-b data-fx="rise">Node.js</span><span class="chip" data-b data-fx="rise">Express</span><span class="chip" data-b data-fx="rise">Supabase</span><span class="chip" data-b data-fx="rise">Socket.io</span><span class="chip" data-b data-fx="rise">MongoDB</span><span class="chip" data-b data-fx="rise">REST &amp; OData</span></div></div>
   <div class="rule" data-b data-fx="wipe"></div>
   <div class="skillrow"><h4 data-b data-type>Frontend</h4><div class="chips"><span class="chip" data-b data-fx="rise">React.js</span><span class="chip" data-b data-fx="rise">JavaScript</span><span class="chip" data-b data-fx="rise">HTML</span><span class="chip" data-b data-fx="rise">CSS</span></div></div>
   <div class="rule" data-b data-fx="wipe"></div>
